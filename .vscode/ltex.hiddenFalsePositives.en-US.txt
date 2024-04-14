@@ -1,0 +1,2 @@
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qtemplate"}
+{"rule":"UPPERCASE_SENTENCE_START","sentence":"^\\Qpreproc"}

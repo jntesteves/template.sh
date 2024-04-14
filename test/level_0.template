@@ -1,0 +1,52 @@
+#!/bin/sh
+# SPDX-License-Identifier: Unlicense
+#{{{
+# shellcheck disable=SC1054,SC1083,SC2034,SC2182,SC2288
+#}}}
+# ===== Basic expressions =====================================================================
+var={{{}}}
+var={{{printf value}}}
+var={{{{}}}}
+var={{{{printf value}}}}
+var={{{    }}}""
+var={{{ printf value1 }}}{{{ printf value2 }}} }}}
+{{{printf name}}}={{{    printf value    }}}
+{{{printf name}}}="{{{ printf value1 }}} + some text + {{{ printf value2 }}} + {{{ printf value3 }}}"
+{{{ printf cmd }}}{{{ printf arg1 }}}{{{ printf arg2 }}}
+{{{ printf cmd }}} {{{ printf arg1 }}} {{{ printf arg2 }}}
+# ===== Quoted expressions ====================================================================
+var='{{{'printf value'}}}'
+lf_character='{{{ echo }}}'
+var='{{{' printf "it's got apostrophe!" '}}} But will the echos break 2 lines here?{{{' echo; echo '}}}'
+var='{{{' printf value\'1; printf value2\' '}}} {{{'printf "value3"'}}}{{{' printf "'value4" '}}}'
+# ===== Parameter Expansion, Arithmetic Expansion, Command Substitution =======================
+{{{'$TWO_NEW_LINES'}}}
+: after two lines, command: {{{$COMMAND}}}
+{{{$TWO_NEW_LINES}}}
+: after two lines, version='{{{'$VERSION'}}}+{{{'$TAG'}}} {{{'$((11 + 22))'}}}'
+: Arithmetic Expansion: {{{$((11 + 22 + 33))}}}
+: Command Substitution: {{{$(echo printf '%s' printf) arg1}}}  {{{ $(echo echo) }}}  {{{IFS=' '; $(echo printf '%s' arg2) arg3}}}
+# ===== Multiline and nested expressions ======================================================
+{{{ printf ' %s' {{{ printf cmd }}} arg1 arg2 }}}{{{
+	echo
+	echo
+}}}
+{{{
+	echo '# echo from level 1 nesting. next level: %s'
+	{{{
+		printf '# printf from level 2 nesting. next level: %s'
+		{{{ printf '# printf from level 3 nesting.' }}}
+		{{{ printf '# level 3 again!' }}}			{{{printf "ARG_VERSION=${ARG_VERSION}"}}}
+	}}}
+	echo \# echo from level 1 again!
+	A
+	B
+	C
+	{{{
+		{{{			}}}
+	}}}
+	printf '# last printf from level 1 nesting'
+}}}
+# ===== Render another file ===================================================================
+{{{render ./level_1.template}}}
+# ===== End of level_0.template ===============================================================

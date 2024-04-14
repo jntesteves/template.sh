@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: Unlicense
+# START level_1.template{{{
+# shellcheck shell=sh disable=SC1054,SC1083,SC2034
+#}}}
+VERSION=0.7.0-alpha
+TAG=:latest
+CONTEXT_FILE=./test.context.sh
+{{{
+
+	{{{
+		echo \# A
+	}}}
+
+	B
+
+	C
+}}}
+A() { printf '#AAA'; }
+B() { printf '#BBB'; }
+C() { printf '#CCC'; }
+
+D() { printf '#DDD'; }
+
+
+E() { printf '#EEE'; }
+
+# END level_1.template
+

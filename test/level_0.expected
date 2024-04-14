@@ -1,0 +1,50 @@
+#!/bin/sh
+# SPDX-License-Identifier: Unlicense
+#
+# ===== Basic expressions =====================================================================
+var=
+var=value
+var={}
+var={value}
+var=""
+var=value1value2 }}}
+name=value
+name="value1 + some text + value2 + value3"
+cmdarg1arg2
+cmd arg1 arg2
+# ===== Quoted expressions ====================================================================
+var='value'
+lf_character='
+'
+var='it'\''s got apostrophe! But will the echos break 2 lines here?'
+var='value'\''1value2'\'' value3'\''value4'
+# ===== Parameter Expansion, Arithmetic Expansion, Command Substitution =======================
+
+: after two lines, command: ../dist/template.sh
+
+: after two lines, version='0.1.0-pre+tag 33'
+: Arithmetic Expansion: 66
+: Command Substitution: 
+# ===== Multiline and nested expressions ======================================================
+ cmd arg1 arg2
+# echo from level 1 nesting. next level: %s
+# echo from level 1 again!
+#a#b#c# last printf from level 1 nesting
+# ===== Render another file ===================================================================
+# SPDX-License-Identifier: Unlicense
+# START level_1.template
+VERSION=0.7.0-alpha
+TAG=:latest
+CONTEXT_FILE=./test.context.sh
+#b#c
+A() { printf '#AAA'; }
+B() { printf '#BBB'; }
+C() { printf '#CCC'; }
+
+D() { printf '#DDD'; }
+
+
+E() { printf '#EEE'; }
+
+# END level_1.template
+# ===== End of level_0.template ===============================================================
