@@ -24,7 +24,8 @@ var='value'\''1value2'\'' value3'\''value4'
 
 : after two lines, version='0.1.0-pre+tag 33'
 : Arithmetic Expansion: 66
-: Command Substitution: 
+: Command Substitution: arg1  
+  arg2arg3
 # ===== Multiline and nested expressions ======================================================
  cmd arg1 arg2
 # echo from level 1 nesting. next level: %s

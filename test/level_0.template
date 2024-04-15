@@ -25,7 +25,7 @@ var='{{{' printf value\'1; printf value2\' '}}} {{{'printf "value3"'}}}{{{' prin
 {{{$TWO_NEW_LINES}}}
 : after two lines, version='{{{'$VERSION'}}}+{{{'$TAG'}}} {{{'$((11 + 22))'}}}'
 : Arithmetic Expansion: {{{$((11 + 22 + 33))}}}
-: Command Substitution: {{{$(echo printf '%s' printf) arg1}}}  {{{ $(echo echo) }}}  {{{IFS=' '; $(echo printf '%s' arg2) arg3}}}
+: Command Substitution: {{{$(echo printf) arg1}}}  {{{ $(echo echo) }}}  {{{IFS=' '; $(echo printf '%s' arg2) arg3}}}
 # ===== Multiline and nested expressions ======================================================
 {{{ printf ' %s' {{{ printf cmd }}} arg1 arg2 }}}{{{
 	echo

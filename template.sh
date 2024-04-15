@@ -151,7 +151,8 @@ render() (
 			case "$*" in
 			*'{{{'*'}}}'*)
 				log_debug "buffered=$*"
-				set -- "$(__tpl__expand_rightmost_expression "$@")" || abort "Failed to render line='$__tpl__input_line'"
+				__tpl__render_buffer="$(__tpl__expand_rightmost_expression "$@")" || abort "Failed to render line='$__tpl__input_line'"
+				set -- "$__tpl__render_buffer"
 				log_debug "expanded=$*"
 				;;
 			*'{{{'*)
