@@ -114,16 +114,21 @@ __tpl__expand_leftmost_expression() {
 	__tpl__tail=${1#*'{{{'}
 	__tpl__tail=${__tpl__tail#*'}}}'}
 	__tpl__head=${1%"{{{${__tpl__match}}}}${__tpl__tail}"}
+	set --
 	log_trace "__tpl__head='${__tpl__head}' __tpl__match='${__tpl__match}' __tpl__tail='${__tpl__tail}'"
-	printf '%s' "$__tpl__head"
+	printf '%s' "$__tpl__head" || return 1
 	if [ "$__tpl__is_quoted" ]; then
 		if [ "$__tpl__is_parameter_expansion" ]; then
 			escape_single_quotes_builtin "$__tpl__parameter_expansion" || return 1
 		else
-			escape_single_quotes_builtin "$(eval "$__tpl__command")" || return 1
+			# FIXME: Command Substitution truncates trailing whitespace
+			# It is hard to avoid Command Substitution in this case. It might require using a temporary file, which
+			# introduces risk of races and loss of data because this function is called recursively
+			__tpl__parameter_expansion=$(eval "$__tpl__command" </dev/null) || return 1
+			escape_single_quotes_builtin "$__tpl__parameter_expansion" || return 1
 		fi
 	else
-		(eval "$__tpl__command") || return 1
+		(eval "$__tpl__command" </dev/null) || return 1
 	fi
 	__tpl__render_buffer="$__tpl__tail"
 }
