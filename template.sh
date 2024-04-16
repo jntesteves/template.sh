@@ -147,7 +147,7 @@ render() (
 			case "$__tpl__render_buffer" in
 			*'{{{'*'}}}'*)
 				log_debug "buffered expression=$__tpl__render_buffer"
-				__tpl__expand_leftmost_expression "$__tpl__render_buffer" || abort "Failed to render line='$__tpl__input_line'"
+				__tpl__expand_leftmost_expression "$__tpl__render_buffer" || abort "Failed to render line='$__tpl__render_buffer'"
 				log_debug " buffered remainder=$__tpl__render_buffer"
 				;;
 			*'{{{'*)
