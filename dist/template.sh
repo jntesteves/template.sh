@@ -73,7 +73,7 @@ assign_variable() {
 	eval "${1%%=*}='$(escape_single_quotes_builtin "${1#*=}")'"
 }
 
-__tpl__expand_leftmost_expression() (
+__tpl__expand_leftmost_expression() {
 	__tpl__match=${1#*'{{{'}
 	__tpl__match=${__tpl__match%%'}}}'*}
 	__tpl__match=${__tpl__match##*'{{{'}
@@ -125,8 +125,8 @@ __tpl__expand_leftmost_expression() (
 	else
 		(eval "$__tpl__command") || return 1
 	fi
-	printf '%s\n' "$__tpl__tail"
-)
+	__tpl__render_buffer="$__tpl__tail"
+}
 
 # Render templates expanding all expressions recursively, print result to stdout
 # Accepts input from stdin and/or arguments, same UI as the cat utility
@@ -146,17 +146,17 @@ render() (
 		while :; do
 			case "$__tpl__render_buffer" in
 			*'{{{'*'}}}'*)
-				log_debug "buffered=$__tpl__render_buffer"
-				__tpl__render_buffer="$(__tpl__expand_leftmost_expression "$__tpl__render_buffer")" || abort "Failed to render line='$__tpl__input_line'"
-				log_debug "expanded=$__tpl__render_buffer"
+				log_debug "buffered expression=$__tpl__render_buffer"
+				__tpl__expand_leftmost_expression "$__tpl__render_buffer" || abort "Failed to render line='$__tpl__input_line'"
+				log_debug " buffered remainder=$__tpl__render_buffer"
 				;;
 			*'{{{'*)
-				log_trace "buffered=$__tpl__render_buffer"
+				log_trace "  buffered open tag=$__tpl__render_buffer"
 				__tpl__open_tags=1
 				break
 				;;
 			*)
-				log_trace "buffered=$__tpl__render_buffer"
+				log_trace "     buffered flush=$__tpl__render_buffer"
 				__tpl__open_tags=
 				break
 				;;

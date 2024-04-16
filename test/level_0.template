@@ -36,7 +36,7 @@ var='{{{' printf value\'1; printf value2\' '}}} {{{'printf "value3"'}}}{{{' prin
 	{{{
 		printf '# printf from level 2 nesting. next level: %s'
 		{{{ printf '# printf from level 3 nesting.' }}}
-		{{{ printf '# level 3 again!' }}}			{{{printf "ARG_VERSION=${ARG_VERSION}"}}}
+		{{{ printf '# level 3 again!' }}}			{{{printf "ARG_VERSION=${ARG_VERSION}		"}}}
 	}}}
 	echo \# echo from level 1 again!
 	A
