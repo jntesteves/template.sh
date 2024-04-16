@@ -37,7 +37,8 @@ for __target in $(list_targets); do
 		run rm -f "${PREFIX}/bin/${app_name}"
 		;;
 	clean)
-		run_ rm -r ${BUILD_DIR}
+		test_output_files=$(wildcard ./test/*.out)
+		[ "${test_output_files}" ] && run_ rm ${test_output_files}
 		;;
 	test)
 		test
