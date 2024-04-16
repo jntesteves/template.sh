@@ -52,7 +52,7 @@ var='value'\''1value2'\'' value3'\''value4'
 }}}
 # ===== Render another file ===================================================================
 # SPDX-License-Identifier: Unlicense
-# START level_1.template
+# START level_2.template
 VERSION=0.7.0-alpha
 TAG=:latest
 CONTEXT_FILE=./test.context.sh
@@ -74,7 +74,7 @@ D() { printf '#DDD'; }
 
 E() { printf '#EEE'; }
 
-# END level_1.template
+# END level_2.template
 
 
-# ===== End of level_0.template ===============================================================
+# ===== End of level_1.template ===============================================================
