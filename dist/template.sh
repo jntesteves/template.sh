@@ -73,13 +73,13 @@ assign_variable() {
 	eval "${1%%=*}='$(escape_single_quotes_builtin "${1#*=}")'"
 }
 
-__tpl__expand_rightmost_expression() (
-	__tpl__match=${1%'}}}'*}
-	__tpl__match=${__tpl__match##*'{{{'}
+__tpl__expand_leftmost_expression() (
+	__tpl__match=${1#*'{{{'}
 	__tpl__match=${__tpl__match%%'}}}'*}
+	__tpl__match=${__tpl__match##*'{{{'}
 	while :; do
 		case "$__tpl__match" in
-		*\}) __tpl__match=${__tpl__match%'}'} ;;
+		\{*) __tpl__match=${__tpl__match#'{'} ;;
 		*) break ;;
 		esac
 	done
@@ -111,9 +111,9 @@ __tpl__expand_rightmost_expression() (
 			;;
 		esac
 	fi
-	__tpl__head=${1%'}}}'*}
-	__tpl__head=${__tpl__head%'{{{'*}
-	__tpl__tail=${1#"${__tpl__head}{{{${__tpl__match}}}}"}
+	__tpl__tail=${1#*'{{{'}
+	__tpl__tail=${__tpl__tail#*'}}}'}
+	__tpl__head=${1%"{{{${__tpl__match}}}}${__tpl__tail}"}
 	log_trace "__tpl__head='${__tpl__head}' __tpl__match='${__tpl__match}' __tpl__tail='${__tpl__tail}'"
 	printf '%s' "$__tpl__head"
 	if [ "$__tpl__is_quoted" ]; then
@@ -147,7 +147,7 @@ render() (
 			case "$__tpl__render_buffer" in
 			*'{{{'*'}}}'*)
 				log_debug "buffered=$__tpl__render_buffer"
-				__tpl__render_buffer="$(__tpl__expand_rightmost_expression "$__tpl__render_buffer")" || abort "Failed to render line='$__tpl__input_line'"
+				__tpl__render_buffer="$(__tpl__expand_leftmost_expression "$__tpl__render_buffer")" || abort "Failed to render line='$__tpl__input_line'"
 				log_debug "expanded=$__tpl__render_buffer"
 				;;
 			*'{{{'*)
