@@ -74,10 +74,7 @@ assign_variable() {
 }
 
 __tpl__expand_rightmost_expression() (
-	IFS='
-'
-	__tpl__buffer=$*
-	__tpl__match=${__tpl__buffer%'}}}'*}
+	__tpl__match=${1%'}}}'*}
 	__tpl__match=${__tpl__match##*'{{{'}
 	__tpl__match=${__tpl__match%%'}}}'*}
 	while :; do
@@ -114,19 +111,19 @@ __tpl__expand_rightmost_expression() (
 			;;
 		esac
 	fi
-	__tpl__head=${__tpl__buffer%'}}}'*}
+	__tpl__head=${1%'}}}'*}
 	__tpl__head=${__tpl__head%'{{{'*}
-	__tpl__tail=${__tpl__buffer#"${__tpl__head}{{{${__tpl__match}}}}"}
+	__tpl__tail=${1#"${__tpl__head}{{{${__tpl__match}}}}"}
 	log_trace "__tpl__head='${__tpl__head}' __tpl__match='${__tpl__match}' __tpl__tail='${__tpl__tail}'"
 	printf '%s' "$__tpl__head"
 	if [ "$__tpl__is_quoted" ]; then
 		if [ "$__tpl__is_parameter_expansion" ]; then
 			escape_single_quotes_builtin "$__tpl__parameter_expansion" || return 1
 		else
-			escape_single_quotes_builtin "$(IFS= && eval "$__tpl__command")" || return 1
+			escape_single_quotes_builtin "$(eval "$__tpl__command")" || return 1
 		fi
 	else
-		(IFS= && eval "$__tpl__command") || return 1
+		(eval "$__tpl__command") || return 1
 	fi
 	printf '%s\n' "$__tpl__tail"
 )
@@ -141,27 +138,25 @@ render() (
 		esac
 	done
 	[ "$#" -eq 0 ] || return 0 # Only render from stdin when no arguments
+	unset __tpl__render_buffer
 	__tpl__open_tags=
-	IFS='
-'
 	while IFS= read -r __tpl__input_line || [ "$__tpl__input_line" ]; do
-		# Use the arguments list (the only native list type in sh) to buffer lines
-		set -- "$@" "$__tpl__input_line" # Buffer one more line
+		__tpl__render_buffer="${__tpl__render_buffer+"${__tpl__render_buffer}
+"}${__tpl__input_line}" # Buffer one more line
 		while :; do
-			case "$*" in
+			case "$__tpl__render_buffer" in
 			*'{{{'*'}}}'*)
-				log_debug "buffered=$*"
-				__tpl__render_buffer="$(__tpl__expand_rightmost_expression "$@")" || abort "Failed to render line='$__tpl__input_line'"
-				set -- "$__tpl__render_buffer"
-				log_debug "expanded=$*"
+				log_debug "buffered=$__tpl__render_buffer"
+				__tpl__render_buffer="$(__tpl__expand_rightmost_expression "$__tpl__render_buffer")" || abort "Failed to render line='$__tpl__input_line'"
+				log_debug "expanded=$__tpl__render_buffer"
 				;;
 			*'{{{'*)
-				log_trace "buffered=$*"
+				log_trace "buffered=$__tpl__render_buffer"
 				__tpl__open_tags=1
 				break
 				;;
 			*)
-				log_trace "buffered=$*"
+				log_trace "buffered=$__tpl__render_buffer"
 				__tpl__open_tags=
 				break
 				;;
@@ -169,11 +164,11 @@ render() (
 		done
 		log_trace "__tpl__open_tags=${__tpl__open_tags}"
 		if [ ! "$__tpl__open_tags" ]; then # Flush buffer only when all opened tags are closed
-			printf '%s\n' "$*"
-			set --
+			printf '%s\n' "$__tpl__render_buffer"
+			unset __tpl__render_buffer
 		fi
 	done
-	[ "$#" -eq 0 ] || printf '%s\n' "$*" # Flush data left in the buffer if a tag was left open
+	[ ! "$__tpl__open_tags" ] || printf '%s\n' "$__tpl__render_buffer" # Flush data left in the buffer if a tag was left open
 )
 
 set -f # Disable Pathname Expansion (aka globbing)
