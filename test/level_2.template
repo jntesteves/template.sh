@@ -10,7 +10,6 @@ CONTEXT_FILE=./test.context.sh
 	{{{
 		echo \# A
 	}}}
-
 	B
 
 	C
@@ -18,11 +17,14 @@ CONTEXT_FILE=./test.context.sh
 A() { printf '#AAA'; }
 B() { printf '#BBB'; }
 C() { printf '#CCC'; }
-
 D() { printf '#DDD'; }
-
-
 E() { printf '#EEE'; }
 
+
+# ===== Render yet another file recursively ===================================================
+{{{		render		./level_3.template		}}}
+# ===== Include a file without processing it ==================================================
+# cat can be used to include a file without parsing and rendering as a template
+{{{cat ./poem_2.template.md}}}
 # END level_2.template
 

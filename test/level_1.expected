@@ -60,7 +60,6 @@ CONTEXT_FILE=./test.context.sh
 
 	# A
 
-
 	B
 
 	C
@@ -68,11 +67,77 @@ CONTEXT_FILE=./test.context.sh
 A() { printf '#AAA'; }
 B() { printf '#BBB'; }
 C() { printf '#CCC'; }
-
 D() { printf '#DDD'; }
-
-
 E() { printf '#EEE'; }
+
+
+# ===== Render yet another file recursively ===================================================
+# SPDX-License-Identifier: Unlicense
+# START level_3.template
+# ===== Side-effects ==========================================================================
+# ' tag '                # There are no side-effects
+# 'tag' - arguments:  "" # There are no arguments
+# ===== Loops =================================================================================
+ c=1 c=2 c=3 c=4 c=5 c=6 c=7 c=8 c=9 c=10
+# That was too easy, let's try reading a file
+./poem_1.template.md line  1: # {{{$POEM_TITLE}}}
+./poem_1.template.md line  2: ## {{{$POEM_SUBTITLE_1}}}
+./poem_1.template.md line  3: ```shell
+./poem_1.template.md line  4: # In shell scripts unfold
+./poem_1.template.md line  5: echo 'of the code, stories told
+./poem_1.template.md line  6: Nice things echo, gleam, and glow'
+./poem_1.template.md line  7: printf "the beauty in controlled flow"
+./poem_1.template.md line  8: 
+./poem_1.template.md line  9: for command in $commands; do
+./poem_1.template.md line 10: case $operand in (expression) lies
+./poem_1.template.md line 11: if $count is greater than $limit; then
+./poem_1.template.md line 12: break out of the loop before my demise
+./poem_1.template.md line 13: 
+./poem_1.template.md line 14: function over { form; has been said
+./poem_1.template.md line 15: in structured $lines they embrace
+./poem_1.template.md line 16: if $infinite; then solve with $pi or; fi
+./poem_1.template.md line 17: this equation got fibonacci high; }
+./poem_1.template.md line 18: 
+./poem_1.template.md line 19: # Nice things in shell scripts, remain
+./poem_1.template.md line 20: echo of scripts drum, bash and reverberate
+./poem_1.template.md line 21: but beware of rules, syntactic, lexical
+./poem_1.template.md line 22: for scripts; do burn & leave stain
+./poem_1.template.md line 23: ```
+
+# Reading from stdin should not consume stdin from the outer scope
+
+# ===== Extreme stuff =========================================================================
+# '}}}}}}}A{{{{#b}}}}C{{{{#d}}}}E{{{{}}}A{{{#b}}}C{{{#d}}}E{{{}}A{{#b}}C{{#d}}E{{}A{#b}C{#d}E{A#bC#dE{{{'
+# '}}A{{B}}C{{D}}E{{'
+
+# Ending with a dangling opening tag should not truncate the rest of the file
+: {{{
+	# Some text that should totally still be here after rendering...
+# END level_3.template
+
+# ===== Include a file without processing it ==================================================
+# cat can be used to include a file without parsing and rendering as a template
+# {{{$POEM_TITLE}}}
+## {{{$POEM_SUBTITLE_2}}}
+Within the shell I probe and search  
+Using grep and find, eager and recursive  
+From each command, a structured script  
+Echoes whisper softly as the build succeeds  
+
+In a loop of code, read standard input  
+Parsing options with case and cut  
+From cat to tail, traverse the file  
+Unraveling expressions, line by line  
+
+I change and patch at diff's counsel  
+And test my resolve in a standard error dump  
+No limits but those set by umask's hand  
+As I skim the manual for POSIX userland  
+
+In the redirection of a script's standard output  
+I find the essence of the UNIX philosophy  
+Through links and unlinks, symbolic and hard  
+In Bourne shell's command line I set my heart
 
 # END level_2.template
 

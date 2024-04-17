@@ -1,0 +1,41 @@
+# SPDX-License-Identifier: Unlicense
+# START level_3.template{{{
+# shellcheck shell=sh disable=SC1054,SC1083,SC2034
+#}}}
+# ===== Side-effects ==========================================================================
+# '{{{ TAG=1 }}} {{{$TAG}}} {{{ TAG=2 }}}'                # There are no side-effects
+# '{{{$TAG}}}' - arguments: {{{  printf ' "%s"' "$@"  }}} # There are no arguments
+# ===== Loops =================================================================================
+{{{
+	count=0
+	while count=$((count + 1)); [ "$count" -le 10 ]; do
+		printf ' c=%s' "$count"
+	done
+}}}
+# That was too easy, let's try reading a file
+{{{
+	count=0
+	file=./poem_1.template.md
+	while count=$((count + 1)); IFS= read -r line || [ "$line" ]; do
+		printf '%s line %2s: %s\n' "$file" "$count" "$line"
+	done <"$file"
+}}}
+# Reading from stdin should not consume stdin from the outer scope
+{{{
+	count=0
+	while count=$((count + 1)); IFS= read -r line || [ "$line" ]; do
+		printf '%s: stolen template line: %s\n' "$count" "$line"
+	done
+}}}
+# ===== Extreme stuff =========================================================================
+# '}}}}}}}A{{{{{{{B}}}}}}}C{{{{{{{D}}}}}}}E{{{{{{{'
+# '}}}}}}A{{{{{{B}}}}}}C{{{{{{D}}}}}}E{{{{{{'
+# '}}}}}A{{{{{B}}}}}C{{{{{D}}}}}E{{{{{'
+# '}}}}A{{{{B}}}}C{{{{D}}}}E{{{{'
+# '}}}A{{{B}}}C{{{D}}}E{{{'
+# '}}A{{B}}C{{D}}E{{'
+
+# Ending with a dangling opening tag should not truncate the rest of the file
+: {{{
+	# Some text that should totally still be here after rendering...
+# END level_3.template
