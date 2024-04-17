@@ -37,9 +37,9 @@ abort() {
 cat() (
 	for filename in "$@"; do # Recursively print each file in arguments
 		case "$filename" in
-		-u) ;;    # Ignore unused flag
-		-) cat ;; # Print stdin
-		*) cat <"$filename" ;;
+		-u) ;;              # Ignore unused flag
+		-) cat || return ;; # Print stdin
+		*) cat <"$filename" || return ;;
 		esac
 	done
 	[ "$#" -eq 0 ] || return 0 # Only print from stdin when no arguments
@@ -138,8 +138,8 @@ __tpl__expand_leftmost_expression() {
 render() (
 	for __tpl__filename in "$@"; do # Recursively render each file in arguments
 		case "$__tpl__filename" in
-		-) render ;; # Render stdin
-		*) render <"$__tpl__filename" ;;
+		-) render || return ;; # Render stdin
+		*) render <"$__tpl__filename" || return ;;
 		esac
 	done
 	[ "$#" -eq 0 ] || return 0 # Only render from stdin when no arguments
