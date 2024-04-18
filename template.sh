@@ -27,8 +27,9 @@ log_error() (IFS=' ' && printf 'ERROR [template.sh] %s\n' "$*" >&2)
 log_debug() { :; } && [ "$TEMPLATE_SH_DEBUG" ] && log_debug() (IFS=' ' && printf 'DEBUG [template.sh] %s\n' "$*" >&2)
 log_trace() { :; } && case "$TEMPLATE_SH_DEBUG" in *trace*) log_trace() (IFS=' ' && printf 'TRACE [template.sh] %s\n' "$*" >&2) ;; esac
 abort() {
-	log_error "$1"
-	exit "${2:-1}"
+	__abort__status=${2:-$?}
+	log_error "$1" || :
+	exit "$__abort__status"
 }
 
 # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/cat.html
@@ -116,19 +117,19 @@ __tpl__expand_leftmost_expression() {
 	__tpl__head=${1%"{{{${__tpl__match}}}}${__tpl__tail}"}
 	set --
 	log_trace "__tpl__head='${__tpl__head}' __tpl__match='${__tpl__match}' __tpl__tail='${__tpl__tail}'"
-	printf '%s' "$__tpl__head" || return 1
+	printf '%s' "$__tpl__head" || return
 	if [ "$__tpl__is_quoted" ]; then
 		if [ "$__tpl__is_parameter_expansion" ]; then
-			escape_single_quotes_builtin "$__tpl__parameter_expansion" || return 1
+			escape_single_quotes_builtin "$__tpl__parameter_expansion" || return
 		else
 			# FIXME: Command Substitution truncates trailing whitespace
 			# It is hard to avoid Command Substitution in this case. It might require using a temporary file, which
 			# introduces risk of races and loss of data because this function is called recursively
-			__tpl__parameter_expansion=$(eval "$__tpl__command" </dev/null) || return 1
-			escape_single_quotes_builtin "$__tpl__parameter_expansion" || return 1
+			__tpl__parameter_expansion=$(eval "$__tpl__command" </dev/null) || return
+			escape_single_quotes_builtin "$__tpl__parameter_expansion" || return
 		fi
 	else
-		(eval "$__tpl__command" </dev/null) || return 1
+		(eval "$__tpl__command" </dev/null) || return
 	fi
 	__tpl__render_buffer="$__tpl__tail"
 }
@@ -152,7 +153,7 @@ render() (
 			case "$__tpl__render_buffer" in
 			*'{{{'*'}}}'*)
 				log_debug "buffered expression=$__tpl__render_buffer"
-				__tpl__expand_leftmost_expression "$__tpl__render_buffer" || abort "Failed to render line='$__tpl__render_buffer'"
+				__tpl__expand_leftmost_expression "$__tpl__render_buffer" || abort "(error $?) Failed to render line: $__tpl__render_buffer"
 				log_debug " buffered remainder=$__tpl__render_buffer"
 				;;
 			*'{{{'*)
