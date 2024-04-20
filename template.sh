@@ -57,7 +57,7 @@ cat() (
 # Substitute every instance of character in text with replacement string
 # This function uses only shell builtins and has no external dependencies (f.e. on sed)
 # This is slower than using sed on a big input, but faster on many invocations with small inputs
-substitute_character_builtin() (
+substitute_character() (
 	set -f # Disable Pathname Expansion (aka globbing)
 	IFS="$1"
 	trailing_match=
@@ -73,12 +73,12 @@ substitute_character_builtin() (
 )
 
 # Escape text for use in a shell script single-quoted string (shell builtin version)
-escape_single_quotes_builtin() { substitute_character_builtin \' "'\\''" "$1"; }
+escape_single_quotes() { substitute_character \' "'\\''" "$1"; }
 
 # Use indirection to dynamically assign a variable from argument NAME=VALUE
 assign_variable() {
 	case "${1%%=*}" in *[!_a-zA-Z0-9]* | [!_a-zA-Z]*) return 1 ;; esac
-	eval "${1%%=*}='$(escape_single_quotes_builtin "${1#*=}")'"
+	eval "${1%%=*}='$(escape_single_quotes "${1#*=}")'"
 }
 
 __tpl__expand_leftmost_expression() {
@@ -128,10 +128,10 @@ __tpl__expand_leftmost_expression() {
 	if [ "$__tpl__is_quoted" ]; then
 		if [ "$__tpl__is_parameter_expansion" ]; then
 			eval "__tpl__parameter_expansion=${__tpl__parameter_expansion}"
-			escape_single_quotes_builtin "$__tpl__parameter_expansion" || return
+			escape_single_quotes "$__tpl__parameter_expansion" || return
 		else
 			assign __tpl__parameter_expansion eval "$__tpl__command" </dev/null || return
-			escape_single_quotes_builtin "$__tpl__parameter_expansion" || return
+			escape_single_quotes "$__tpl__parameter_expansion" || return
 		fi
 	else
 		(eval "$__tpl__command" </dev/null) || return
