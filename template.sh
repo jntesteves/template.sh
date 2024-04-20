@@ -32,6 +32,13 @@ abort() {
 	exit "$__abort__status"
 }
 
+# Assign the stdout of command to variable, avoid Command Substitution truncating leading and/or trailing whitespace
+assign() {
+	__assign__var_name=$1 && shift || return
+	eval "${__assign__var_name}=\$(printf : && \"\$@\" && printf :) || return
+		${__assign__var_name}=\${${__assign__var_name}#?} ${__assign__var_name}=\${${__assign__var_name}%?}"
+}
+
 # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/cat.html
 # Simple POSIX-compatible cat utility in pure shell script
 # shellcheck disable=2120
@@ -122,10 +129,7 @@ __tpl__expand_leftmost_expression() {
 		if [ "$__tpl__is_parameter_expansion" ]; then
 			escape_single_quotes_builtin "$__tpl__parameter_expansion" || return
 		else
-			# FIXME: Command Substitution truncates trailing whitespace
-			# It is hard to avoid Command Substitution in this case. It might require using a temporary file, which
-			# introduces risk of races and loss of data because this function is called recursively
-			__tpl__parameter_expansion=$(eval "$__tpl__command" </dev/null) || return
+			assign __tpl__parameter_expansion eval "$__tpl__command" </dev/null || return
 			escape_single_quotes_builtin "$__tpl__parameter_expansion" || return
 		fi
 	else

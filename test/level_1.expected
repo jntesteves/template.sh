@@ -16,7 +16,9 @@ cmd arg1 arg2
 var='value'
 lf_character='
 '
-var='it'\''s got apostrophe! But will the echos break 2 lines here?'
+var='it'\''s got apostrophe! But will the echos break 2 lines here?
+
+'
 var='value'\''1value2'\'' value3'\''value4'
 # ===== Parameter Expansion, Arithmetic Expansion, Command Substitution =======================
 

@@ -8,5 +8,5 @@ template=../dist/template.sh
 $template -s test.context.sh -e ARG_VERSION=0.99.1-pre level_1.template >|level_1.out &&
 	diff level_1.expected level_1.out || return
 
-$template preproc_test.template >preproc_test.out &&
+$template preproc_test.template >|preproc_test.out &&
 	diff preproc_test.expected preproc_test.out || return
