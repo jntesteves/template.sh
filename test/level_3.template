@@ -8,7 +8,8 @@
 # ===== Loops =================================================================================
 {{{
 	count=0
-	while count=$((count + 1)); [ "$count" -le 10 ]; do
+	while [ "$count" -lt 10 ]; do
+		count=$((count + 1))
 		printf ' c=%s' "$count"
 	done
 }}}
@@ -16,14 +17,16 @@
 {{{
 	count=0
 	file=./poem_1.template.md
-	while count=$((count + 1)); IFS= read -r line || [ "$line" ]; do
+	while IFS= read -r line || [ "$line" ]; do
+		count=$((count + 1))
 		printf '%s line %2s: %s\n' "$file" "$count" "$line"
 	done <"$file"
 }}}
 # Reading from stdin should not consume stdin from the outer scope
 {{{
 	count=0
-	while count=$((count + 1)); IFS= read -r line || [ "$line" ]; do
+	while IFS= read -r line || [ "$line" ]; do
+		count=$((count + 1))
 		printf '%s: stolen template line: %s\n' "$count" "$line"
 	done
 }}}
