@@ -32,11 +32,28 @@ abort() {
 	exit "$__abort__status"
 }
 
-# Assign the stdout of command to variable, avoid Command Substitution truncating leading and/or trailing whitespace
-assign() {
-	__assign__var_name=$1 && shift || return
-	eval "${__assign__var_name}=\$(printf : && \"\$@\" && printf :) || return
-		${__assign__var_name}=\${${__assign__var_name}#?} ${__assign__var_name}=\${${__assign__var_name}%?}"
+# Pipeline Error Propagation Protocol
+__pep__hash1() { printf '\037''7gQNKAnbAhkNw0yV64QaFv6bIBqY7FvW'; }
+__pep__hash2() { printf 'PZqUCjJCTvG9QNP8mZr07CV7jfYK5j2Q''\037'; }
+__pep__status() (
+	payload=${1#*"$(__pep__hash1)"}
+	payload=${payload%%"$(__pep__hash2)"*}
+	payload=${payload##*"$(__pep__hash1)"}
+	status=$(printf '%.f' "$payload") || status=32
+	printf '%s' "$status"
+)
+pipe_throw() { printf '%s\n' "$(__pep__hash1)$?$(__pep__hash2)"; }
+pipe_try() { ("$@") || pipe_throw; }
+pipe_catch() {
+	[ "$#" -gt 0 ] || set -- printf '%s'
+	__pipe_catch__trailing_lf='
+'
+	while IFS= read -r __pipe_catch__line || { __pipe_catch__trailing_lf= && [ "$__pipe_catch__line" ]; }; do
+		case "$__pipe_catch__line" in
+		*"$(__pep__hash1)"*"$(__pep__hash2)"*) return "$(__pep__status "$__pipe_catch__line")" ;;
+		*) "$@" "${__pipe_catch__line}${__pipe_catch__trailing_lf}" || return ;;
+		esac
+	done
 }
 
 # https://pubs.opengroup.org/onlinepubs/9699919799/utilities/cat.html
@@ -132,8 +149,7 @@ __tpl__expand_leftmost_expression() {
 			eval "__tpl__parameter_expansion=${__tpl__parameter_expansion}"
 			escape_single_quotes "$__tpl__parameter_expansion" || return
 		else
-			assign __tpl__parameter_expansion eval "$__tpl__command" </dev/null || return
-			escape_single_quotes "$__tpl__parameter_expansion" || return
+			pipe_try eval "$__tpl__command" </dev/null | pipe_catch escape_single_quotes || return
 		fi
 	else
 		(eval "$__tpl__command" </dev/null) || return
