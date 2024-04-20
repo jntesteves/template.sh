@@ -51,7 +51,9 @@ cat() (
 		esac
 	done
 	[ "$#" -eq 0 ] || return 0 # Only print from stdin when no arguments
-	while IFS= read -r line || [ "$line" ]; do printf '%s\n' "$line"; done
+	trailing_lf='
+'
+	while IFS= read -r line || { trailing_lf= && [ "$line" ]; }; do printf '%s' "${line}${trailing_lf}" || return; done
 )
 
 # Substitute every instance of character in text with replacement string
@@ -151,7 +153,9 @@ render() (
 	[ "$#" -eq 0 ] || return 0 # Only render from stdin when no arguments
 	unset __tpl__render_buffer
 	__tpl__open_tags=
-	while IFS= read -r __tpl__input_line || [ "$__tpl__input_line" ]; do
+	__tpl__render_trailing_lf='
+'
+	while IFS= read -r __tpl__input_line || { __tpl__render_trailing_lf= && [ "$__tpl__input_line" ]; }; do
 		__tpl__render_buffer="${__tpl__render_buffer+"${__tpl__render_buffer}
 "}${__tpl__input_line}" # Buffer one more line
 		while :; do
@@ -175,7 +179,7 @@ render() (
 		done
 		log_trace "__tpl__open_tags=${__tpl__open_tags}"
 		if [ ! "$__tpl__open_tags" ]; then # Flush buffer only when all opened tags are closed
-			printf '%s\n' "$__tpl__render_buffer"
+			printf '%s' "${__tpl__render_buffer}${__tpl__render_trailing_lf}" || abort "(error $?) Failed to write output file"
 			unset __tpl__render_buffer
 		fi
 	done
