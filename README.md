@@ -17,8 +17,8 @@ Options:
  -h, --help            Print this help text and exit
 
 Examples:
- template.sh -s program.sh.context program.sh.template >program.sh
- template.sh -e VERSION=1.0 -e TAG=latest program.sh.template >program.sh
+ template.sh -s program.context.sh program.template.sh >program.sh
+ template.sh -e VERSION=1.0 -e TAG=latest program.template.sh >program.sh
 ```
 
 ### Example template file
@@ -34,7 +34,7 @@ GIT_VERSION='{{{' git describe --tags --long --abbrev=40 '}}}'
 ANSWER={{{$((363636 / 13 / 666))}}}
 
 # Another template file can be rendered and embedded anywhere in the result
-{{{render ./functions.sh.template}}}
+{{{render ./functions.template.sh}}}
 ```
 
 ### Functions available in render context
