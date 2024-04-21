@@ -4,8 +4,8 @@
 __tpl__usage() {
 	fd=${1:+2}
 	cat <<'EOF' >&"${fd:-1}"
-template.sh 0.1.0-pre
-Render templates and print result to stdout. Expressions within {{{ and }}} delimiters will be evaluated as shell script and substituted by their stdout in the rendered output. Context variables can be printed directly as {{{$VAR_NAME}}} or {{{'$VAR_NAME'}}} to escape the result for inclusion in single-quoted shell strings
+template.sh {{{$VERSION}}}
+Render templates and print result to stdout. Expressions within {{{$TLB}}} and {{{$TRB}}} delimiters will be evaluated as shell script and substituted by their stdout in the rendered output. Context variables can be printed directly as {{{$TLB}}}$VAR_NAME{{{$TRB}}} or {{{$TLB}}}'$VAR_NAME'{{{$TRB}}} to escape the result for inclusion in single-quoted shell strings
 
 Usage: template.sh [-C PATH]... [-s FILE]... [-e NAME=VALUE]... [-] [FILE...]
 

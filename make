@@ -6,6 +6,7 @@ param BUILD_DIR=./dist
 param PREFIX="${HOME}/.local"
 version=0.1.0-pre
 app_name=template.sh
+dist_bin=${BUILD_DIR}/${app_name}
 shell_scripts=$(wildcard ./*.sh ./make ./test/*.sh)
 selinux_flag=-Z
 # Detect if the SELinux flag (-Z) is supported by the install command on the target platform
@@ -14,6 +15,15 @@ lint() {
 	run shellcheck "$@"
 	run shfmt -d "$@"
 }
+build() {
+	case $version in *[!.0-9]*) version_is_pre_release=1 ;; *) version_is_pre_release= ;; esac
+	git_status=$(git --no-optional-locks status --porcelain) || abort "Failed to read git status"
+	git_last_commit_info=$(git --no-optional-locks log -1 --pretty='format:(%h %cs)') || abort "Failed to read git log"
+	git_tree_is_dirty=${git_status:+1}
+	version_git="${version}${git_tree_is_dirty:+"+dirty"}${version_is_pre_release:+ $git_last_commit_info}"
+	./template.sh -e VERSION=${version_git} ${app_name} >${dist_bin} || abort "Failed to write file ${dist_bin}"
+	chmod +x ${dist_bin} || abort "Failed to chmod file ${dist_bin}"
+}
 test() { run ./test/test.sh; }
 
 for __target in $(list_targets); do
@@ -21,30 +31,25 @@ for __target in $(list_targets); do
 	dist | -)
 		run mkdir -p ${BUILD_DIR}
 		lint ${shell_scripts}
-		run cp ${app_name} "${BUILD_DIR}/${app_name}"
-		lint "${BUILD_DIR}/${app_name}"
+		run build
+		lint ${dist_bin}
 		test
 		;;
-	build-skip-checks)
-		printf 'Unimplemented\n'
-		run return 1
-		./template.sh -e VERSION=${version} ${app_name} >"${BUILD_DIR}/${app_name}"
-		;;
 	install)
-		run install -D ${selinux_flag} -m 755 -t "${PREFIX}/bin" "${BUILD_DIR}/${app_name}"
+		run install -D ${selinux_flag} -m 755 -t "${PREFIX}/bin" ${dist_bin}
 		;;
 	uninstall)
 		run rm -f "${PREFIX}/bin/${app_name}"
 		;;
 	clean)
 		test_output_files=$(wildcard ./test/*.out)
-		[ "${test_output_files}" ] && run_ rm ${test_output_files}
+		[ ! "$test_output_files" ] || run_ rm -r ${test_output_files}
 		;;
 	test)
 		test
 		;;
 	lint)
-		lint ${shell_scripts} "${BUILD_DIR}/${app_name}"
+		lint ${shell_scripts} ${dist_bin}
 		;;
 	format)
 		run shfmt -w ${shell_scripts}
