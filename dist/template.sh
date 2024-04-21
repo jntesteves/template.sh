@@ -101,9 +101,9 @@ assign_variable() {
 }
 
 __tpl__expand_leftmost_expression() {
-	__tpl__match=${1#*'{{{'}
-	__tpl__match=${__tpl__match%%'}}}'*}
-	__tpl__match=${__tpl__match##*'{{{'}
+	__tpl__match=${1#*"$TLB"}
+	__tpl__match=${__tpl__match%%"$TRB"*}
+	__tpl__match=${__tpl__match##*"$TLB"}
 	while :; do
 		case "$__tpl__match" in
 		\{*) __tpl__match=${__tpl__match#'{'} ;;
@@ -138,9 +138,9 @@ __tpl__expand_leftmost_expression() {
 			;;
 		esac
 	fi
-	__tpl__tail=${1#*'{{{'}
-	__tpl__tail=${__tpl__tail#*'}}}'}
-	__tpl__head=${1%"{{{${__tpl__match}}}}${__tpl__tail}"}
+	__tpl__tail=${1#*"$TLB"}
+	__tpl__tail=${__tpl__tail#*"$TRB"}
+	__tpl__head=${1%"${TLB}${__tpl__match}${TRB}${__tpl__tail}"}
 	set --
 	log_trace "__tpl__head='${__tpl__head}' __tpl__match='${__tpl__match}' __tpl__tail='${__tpl__tail}'"
 	printf '%s' "$__tpl__head" || return
@@ -167,6 +167,8 @@ render() (
 		esac
 	done
 	[ "$#" -eq 0 ] || return 0 # Only render from stdin when no arguments
+	TLB=\{\{\{
+	TRB=\}\}\}
 	unset __tpl__render_buffer
 	__tpl__open_tags=
 	__tpl__render_trailing_lf='
@@ -176,12 +178,12 @@ render() (
 "}${__tpl__input_line}" # Buffer one more line
 		while :; do
 			case "$__tpl__render_buffer" in
-			*'{{{'*'}}}'*)
+			*"$TLB"*"$TRB"*)
 				log_debug "buffered expression=$__tpl__render_buffer"
 				__tpl__expand_leftmost_expression "$__tpl__render_buffer" || abort "(error $?) Failed to render line: $__tpl__render_buffer"
 				log_debug " buffered remainder=$__tpl__render_buffer"
 				;;
-			*'{{{'*)
+			*"$TLB"*)
 				log_trace "  buffered open tag=$__tpl__render_buffer"
 				__tpl__open_tags=1
 				break
