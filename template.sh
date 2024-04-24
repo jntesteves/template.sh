@@ -79,16 +79,15 @@ cat() (
 substitute_character() (
 	set -f # Disable Pathname Expansion (aka globbing)
 	IFS="$1"
-	trailing_match=
-	case "$3" in *"$1") [ "$ZSH_VERSION" ] || trailing_match="$2" ;; esac
+	case "$1" in :) pad=^ ;; *) pad=: ;; esac
 	last_field=
 	first=1
-	for field in $3; do
+	for field in ${3}${pad}; do
 		[ "$first" ] || printf '%s%s' "$last_field" "$2"
 		last_field="$field"
 		first=
 	done
-	printf '%s%s' "$last_field" "$trailing_match"
+	printf '%s' "${last_field%?}"
 )
 
 # Escape text for use in a shell script single-quoted string (shell builtin version)
