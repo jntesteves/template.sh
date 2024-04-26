@@ -49,8 +49,8 @@ ANSWER={{{$((363636 / 13 / 666))}}}
 Used internally by template.sh, but exposed publicly because they can be useful.
 
 * `assign_variable NAME=VALUE`: Use indirection to dynamically assign a variable from argument NAME=VALUE
-* `escape_single_quotes text`: Escape text for use in a shell script single-quoted string (shell builtin version)
-* `substitute_character char replacement text`: Substitute every instance of character in text with replacement string. This function uses only shell builtins and has no external dependencies (f.e. on `sed`). This is slower than using `sed` on a big input, but faster on many invocations with small inputs
+* `escape_single_quotes text`: Escape text for use in a shell script single-quoted string
+* `substitute_characters text pattern [replacement] [pad=^]`: Substitute every instance of the pattern characters in text with replacement string. This function uses only shell builtins and has no external dependencies (f.e. on `sed`). This is slower than using `sed` on large inputs, but faster on many invocations with small inputs
 
 ## Dependencies
 
