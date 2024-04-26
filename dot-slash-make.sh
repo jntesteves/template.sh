@@ -17,25 +17,26 @@ abort() {
 	exit "$__abort__status"
 }
 
-# Substitute every instance of character in text with replacement string
+# substitute_characters text pattern [replacement] [pad=^]
+# Substitute every instance of the pattern characters in text with replacement string
 # This function uses only shell builtins and has no external dependencies (f.e. on sed)
-# This is slower than using sed on a big input, but faster on many invocations with small inputs
-substitute_character() (
+# This is slower than using sed on large inputs, but faster on many invocations with small inputs
+substitute_characters() (
 	set -f # Disable Pathname Expansion (aka globbing)
-	IFS="$1"
-	case "$1" in :) pad=^ ;; *) pad=: ;; esac
+	IFS=$2
+	pad=${4:-^}
 	last_field=
 	first=1
-	for field in ${3}${pad}; do
-		[ "$first" ] || printf '%s%s' "$last_field" "$2"
-		last_field="$field"
+	for field in ${1}${pad}; do
+		[ "$first" ] || printf '%s%s' "$last_field" "$3"
+		last_field=$field
 		first=
 	done
 	printf '%s' "${last_field%?}"
 )
 
-# Escape text for use in a shell script single-quoted string (shell builtin version)
-escape_single_quotes() { substitute_character \' "'\\''" "$1"; }
+# Escape text for use in a shell script single-quoted string
+escape_single_quotes() { substitute_characters "$1" \' "'\\''"; }
 
 # Run command in a sub-shell, abort on error
 run() {
