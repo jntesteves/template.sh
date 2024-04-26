@@ -17,7 +17,7 @@ Options:
  -h, --help            Print this help text and exit
 
 Examples:
- template.sh -s program.context.sh program.template.sh >program.sh
+ template.sh -s ./program.context.sh program.template.sh >program.sh
  template.sh -e VERSION=1.0 -e TAG=latest program.template.sh >program.sh
 ```
 
