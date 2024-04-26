@@ -95,7 +95,7 @@ escape_single_quotes() { substitute_character \' "'\\''" "$1"; }
 
 # Use indirection to dynamically assign a variable from argument NAME=VALUE
 assign_variable() {
-	case "${1%%=*}" in *[!_a-zA-Z0-9]* | [!_a-zA-Z]*) return 1 ;; esac
+	case "${1%%=*}" in *[!_a-zA-Z0-9]* | [!_a-zA-Z]*) return 2 ;; esac
 	eval "${1%%=*}='$(escape_single_quotes "${1#*=}")'"
 }
 
