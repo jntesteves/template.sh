@@ -6,6 +6,7 @@ Containerfile
 contr
 globbing
 jntesteves
+mksh
 Pathname
 POSIX
 preproc
