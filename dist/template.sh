@@ -203,13 +203,11 @@ render() (
 	[ ! "$__tpl__open_tags" ] || printf '%s' "$__tpl__render_buffer" # Flush data left in the buffer if a tag was left open
 )
 
-set -f # Disable Pathname Expansion (aka globbing)
-IFS=
 while [ "$#" -gt 0 ]; do
 	case "$1" in
 	-C) { shift && cd "$1"; } || abort "Failed to cd into directory '$1'" ;;
 	-e | --env) { shift && assign_variable "$1"; } || abort "Failed to assign context variable '$1'" ;;
-	-s | --source) { shift && . "$1" && set -f && IFS=; } || abort "Failed to source file '$1'" ;;
+	-s | --source) { shift && . "$1"; } || abort "Failed to source file '$1'" ;;
 	-h | --help) __tpl__usage ;;
 	--) shift && break ;;
 	*) break ;;
