@@ -169,13 +169,12 @@ render() (
 	[ "$#" -eq 0 ] || return 0 # Only render from stdin when no arguments
 	TLB=\{\{\{
 	TRB=\}\}\}
-	unset __tpl__render_buffer
+	__tpl__render_buffer=
 	__tpl__open_tags=
 	__tpl__render_trailing_lf='
 '
 	while IFS= read -r __tpl__input_line || { __tpl__render_trailing_lf= && [ "$__tpl__input_line" ]; }; do
-		__tpl__render_buffer="${__tpl__render_buffer+"${__tpl__render_buffer}
-"}${__tpl__input_line}" # Buffer one more line
+		__tpl__render_buffer="${__tpl__render_buffer}${__tpl__input_line}${__tpl__render_trailing_lf}" # Buffer one more line
 		while :; do
 			case "$__tpl__render_buffer" in
 			*"$TLB"*"$TRB"*)
@@ -197,11 +196,11 @@ render() (
 		done
 		log_trace "__tpl__open_tags=${__tpl__open_tags}"
 		if [ ! "$__tpl__open_tags" ]; then # Flush buffer only when all opened tags are closed
-			printf '%s' "${__tpl__render_buffer}${__tpl__render_trailing_lf}" || abort "(error $?) Failed to write output file"
-			unset __tpl__render_buffer
+			printf '%s' "$__tpl__render_buffer" || abort "(error $?) Failed to write output file"
+			__tpl__render_buffer=
 		fi
 	done
-	[ ! "$__tpl__open_tags" ] || printf '%s\n' "$__tpl__render_buffer" # Flush data left in the buffer if a tag was left open
+	[ ! "$__tpl__open_tags" ] || printf '%s' "$__tpl__render_buffer" # Flush data left in the buffer if a tag was left open
 )
 
 set -f # Disable Pathname Expansion (aka globbing)
