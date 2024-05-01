@@ -17,27 +17,6 @@ abort() {
 	exit "$__abort__status"
 }
 
-# substitute_characters text pattern [replacement] [pad=^]
-# Substitute every instance of the pattern characters in text with replacement string
-# This function uses only shell builtins and has no external dependencies (f.e. on sed)
-# This is slower than using sed on large inputs, but faster on many invocations with small inputs
-substitute_characters() (
-	set -f # Disable Pathname Expansion (aka globbing)
-	IFS=$2
-	pad=${4:-^}
-	last_field=
-	first=1
-	for field in ${1}${pad}; do
-		[ "$first" ] || printf '%s%s' "$last_field" "$3"
-		last_field=$field
-		first=
-	done
-	printf '%s' "${last_field%?}"
-)
-
-# Escape text for use in a shell script single-quoted string
-escape_single_quotes() { substitute_characters "$1" \' "'\\''"; }
-
 # Run command in a sub-shell, abort on error
 run() {
 	log_info "$@"
@@ -53,7 +32,7 @@ run_() {
 # Use indirection to dynamically assign a variable from argument NAME=VALUE
 assign_variable() {
 	case "${1%%=*}" in *[!_a-zA-Z0-9]* | [!_a-zA-Z]*) return 2 ;; esac
-	eval "${1%%=*}='$(escape_single_quotes "${1#*=}")'"
+	eval "${1%%=*}"='${1#*=}'
 }
 
 # Check if the given name was provided as an argument in the CLI
