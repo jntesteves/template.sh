@@ -112,7 +112,6 @@ __tpl__expand_leftmost_expression() {
 	done
 	__tpl__is_quoted=
 	__tpl__is_expansion=
-	__tpl__is_parameter_expansion=
 	case "$__tpl__match" in
 	\'\$[_a-zA-Z]*\' | \'\$\(\(*\)\)\')
 		__tpl__is_quoted=1
