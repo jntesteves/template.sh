@@ -126,16 +126,11 @@ __tpl__expand_leftmost_expression() {
 		__tpl__command=${__tpl__command#?}
 		__tpl__command=${__tpl__command%?}
 	fi
-	__tpl__parameter_expansion=
 	if [ "$__tpl__is_expansion" ]; then
 		case "${__tpl__command#"$"}" in
 		\(\(*\)\)) __tpl__command="printf '%s' \"${__tpl__command}\"" ;; # Arithmetic Expansion
 		*[!_a-zA-Z0-9]* | [!_a-zA-Z]*) __tpl__is_expansion= ;;           # Not a valid variable name
-		*)
-			__tpl__is_parameter_expansion=1
-			__tpl__parameter_expansion=$__tpl__command
-			__tpl__command="printf '%s' \"${__tpl__command}\""
-			;;
+		*) __tpl__command="printf '%s' \"${__tpl__command}\"" ;;
 		esac
 	fi
 	__tpl__tail=${1#*"$TLB"}
@@ -145,12 +140,7 @@ __tpl__expand_leftmost_expression() {
 	log_trace "__tpl__head='${__tpl__head}' __tpl__match='${__tpl__match}' __tpl__tail='${__tpl__tail}'"
 	printf '%s' "$__tpl__head" || return
 	if [ "$__tpl__is_quoted" ]; then
-		if [ "$__tpl__is_parameter_expansion" ]; then
-			eval "__tpl__parameter_expansion=${__tpl__parameter_expansion}"
-			escape_single_quotes "$__tpl__parameter_expansion" || return
-		else
-			pipe_try eval "$__tpl__command" </dev/null | pipe_catch escape_single_quotes || return
-		fi
+		pipe_try eval "$__tpl__command" </dev/null | pipe_catch escape_single_quotes || return
 	else
 		(eval "$__tpl__command" </dev/null) || return
 	fi
