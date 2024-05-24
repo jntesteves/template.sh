@@ -1,6 +1,6 @@
 #!/bin/sh
 # SPDX-License-Identifier: Unlicense
-#
+
 # ===== Basic expressions =====================================================================
 var=
 var=value

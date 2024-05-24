@@ -34,7 +34,12 @@ GIT_VERSION='{{{' git describe --tags --long --abbrev=40 '}}}'
 ANSWER={{{$((363636 / 13 / 666))}}}
 
 # Another template file can be rendered and embedded anywhere in the result
-{{{render ./functions.template.sh}}}
+{{{ render ./functions.template.sh }}}
+
+# A "#" symbol preceding the expression delimiters will be removed from the result, allowing templates to be valid shell script as the delimiters will be commented out, for better integration with tools such as shellcheck and IDEs
+#{{{
+cat ./some/file
+#}}}
 ```
 
 ### Functions available in render context
