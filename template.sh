@@ -170,7 +170,6 @@ render() (
 			*"$TLB"*"$TRB"*)
 				log_debug "buffered expression=$__tpl__render_buffer"
 				__tpl__expand_leftmost_expression "$__tpl__render_buffer" || abort "(error $?) Failed to render line: $__tpl__render_buffer"
-				log_debug " buffered remainder=$__tpl__render_buffer"
 				;;
 			*"$TLB"*)
 				log_trace "  buffered open tag=$__tpl__render_buffer"
@@ -184,7 +183,7 @@ render() (
 				;;
 			esac
 		done
-		log_trace "__tpl__open_tags=${__tpl__open_tags}"
+		# log_trace "__tpl__open_tags=${__tpl__open_tags}"
 		if [ ! "$__tpl__open_tags" ]; then # Flush buffer only when all opened tags are closed
 			printf '%s' "$__tpl__render_buffer" || abort "(error $?) Failed to write output file"
 			__tpl__render_buffer=
