@@ -76,17 +76,16 @@ cat() (
 	while IFS= read -r line || { trailing_lf= && [ "$line" ]; }; do printf '%s' "${line}${trailing_lf}" || return; done
 )
 
-# substitute_characters text pattern [replacement] [pad=^]
+# substitute_characters text pattern [replacement]
 # Substitute every instance of the pattern characters in text with replacement string
 # This function uses only shell builtins and has no external dependencies (f.e. on sed)
 # This is slower than using sed on large inputs, but faster on many invocations with small inputs
 substitute_characters() (
 	set -f # Disable Pathname Expansion (aka globbing)
 	IFS=$2
-	pad=${4:-^}
 	last_field=
 	first=1
-	for field in ${1}${pad}; do
+	for field in ${1}P; do
 		[ "$first" ] || printf '%s%s' "$last_field" "$3"
 		last_field=$field
 		first=
