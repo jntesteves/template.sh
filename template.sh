@@ -135,7 +135,7 @@ __tpl__expand_leftmost_expression() {
 	__tpl__tail=${1#*"$TLB"}
 	__tpl__tail=${__tpl__tail#*"$TRB"}
 	__tpl__head=${1%"${TLB}${__tpl__match}${TRB}${__tpl__tail}"}
-	__tpl__head="${__tpl__head%\#}"
+	__tpl__head=${__tpl__head%\#}
 	set --
 	log_trace "__tpl__head='${__tpl__head}' __tpl__match='${__tpl__match}' __tpl__tail='${__tpl__tail}'"
 	printf '%s' "$__tpl__head" || return
