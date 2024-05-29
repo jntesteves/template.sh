@@ -13,7 +13,10 @@ Options:
  -C PATH               Directory to operate in
  -e, --env NAME=VALUE  Set variable NAME=VALUE in render context
  -s, --source FILE     Source FILE to import its functions/variables in render context
- -h, --help            Print this help text and exit
+ -?, --help            Print this help text and exit
+
+Environment variables:
+ TEMPLATE_SH_DEBUG  Log verbosity, set to 1 or 'trace' to see debug and trace messages
 
 Examples:
  template.sh -s ./program.context.sh program.template.sh >program.sh
@@ -194,14 +197,14 @@ render() (
 
 while [ "$#" -gt 0 ]; do
 	case "$1" in
-	-C) { shift && cd "$1"; } || abort "Failed to cd into directory '$1'" ;;
-	-e | --env) { shift && assign_variable "$1"; } || abort "Failed to assign context variable '$1'" ;;
-	-s | --source) { shift && . "$1"; } || abort "Failed to source file '$1'" ;;
-	-h | --help) __tpl__usage ;;
+	-C) { shift && cd "$1"; } || abort "Failed to cd into directory '-C $1'" ;;
+	-e | --env) { shift && assign_variable "$1"; } || abort "Failed to assign context variable '--env $1'" ;;
+	-s | --source) { shift && . "$1"; } || abort "Failed to source file '--source $1'" ;;
+	-\? | --help) __tpl__usage ;;
 	--) shift && break ;;
 	*) break ;;
 	esac
-	shift || __tpl__usage 1
+	shift || __tpl__usage 2
 done
 
 render "$@"

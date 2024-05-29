@@ -14,7 +14,10 @@ Options:
  -C PATH               Directory to operate in
  -e, --env NAME=VALUE  Set variable NAME=VALUE in render context
  -s, --source FILE     Source FILE to import its functions/variables in render context
- -h, --help            Print this help text and exit
+ -?, --help            Print this help text and exit
+
+Environment variables:
+ TEMPLATE_SH_DEBUG  Log verbosity, set to 1 or 'trace' to see debug and trace messages
 
 Examples:
  template.sh -s ./program.context.sh program.template.sh >program.sh
