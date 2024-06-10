@@ -19,6 +19,7 @@ var='{{{'printf value'}}}'
 lf_character='{{{ echo }}}'
 var='{{{' printf "it's got apostrophe!" '}}} But will the echos break 2 lines here?{{{' echo; echo '}}}'
 var='{{{' printf value\'1; printf value2\' '}}} {{{'printf "value3"'}}}{{{' printf "'value4" '}}}'
+quoted="Some text {{{" printf "[wrapped]" "}}} around expression"
 # ===== Parameter Expansion, Arithmetic Expansion, Command Substitution =======================
 {{{'$TWO_NEW_LINES'}}}
 : after two lines, command: {{{$COMMAND}}}

@@ -43,6 +43,9 @@ ANSWER={{{$((363636 / 13 / 666))}}}
 #{{{
 cat ./some/file
 #}}}
+
+# Also for better tool support, double-quotes as the immediate first and last characters within an expression are removed before the expression is evaluated, to allow template expressions to represent valid code within double-quoted strings
+quoted="Some text {{{" printf "[wrapped]" "}}} around expression"
 ```
 
 ### Functions available in render context

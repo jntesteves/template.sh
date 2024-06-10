@@ -113,6 +113,7 @@ __tpl__expand_leftmost_expression() {
 		esac
 	done
 	__tpl__is_quoted=
+	__tpl__is_double_quoted=
 	__tpl__is_expansion=
 	case "$__tpl__match" in
 	\'\$[_a-zA-Z]*\' | \'\$\(\(*\)\)\')
@@ -121,9 +122,10 @@ __tpl__expand_leftmost_expression() {
 		;;
 	\'*\') __tpl__is_quoted=1 ;;
 	\$[_a-zA-Z]* | \$\(\(*\)\)) __tpl__is_expansion=1 ;;
+	\"*\") __tpl__is_double_quoted=1 ;;
 	esac
 	__tpl__command=$__tpl__match
-	if [ "$__tpl__is_quoted" ]; then
+	if [ "$__tpl__is_quoted" ] || [ "$__tpl__is_double_quoted" ]; then
 		__tpl__command=${__tpl__command#?}
 		__tpl__command=${__tpl__command%?}
 	fi

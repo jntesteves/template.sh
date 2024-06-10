@@ -20,6 +20,7 @@ var='it'\''s got apostrophe! But will the echos break 2 lines here?
 
 '
 var='value'\''1value2'\'' value3'\''value4'
+quoted="Some text [wrapped] around expression"
 # ===== Parameter Expansion, Arithmetic Expansion, Command Substitution =======================
 
 
