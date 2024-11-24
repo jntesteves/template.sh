@@ -83,12 +83,10 @@ cat() (
 substitute_characters() (
 	set -f # Disable Pathname Expansion (aka globbing)
 	IFS=$2
-	last_field=
-	first=
+	unset last_field
 	for field in ${1}P; do
-		printf '%s' ${first:+"${last_field}${3}"}
+		printf '%s' ${last_field+"${last_field}${3}"}
 		last_field=$field
-		first=1
 	done
 	printf '%s' "${last_field%?}"
 )
