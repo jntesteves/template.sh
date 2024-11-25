@@ -104,12 +104,7 @@ __tpl__expand_leftmost_expression() {
 	__tpl__match=${1#*"$TLB"}
 	__tpl__match=${__tpl__match%%"$TRB"*}
 	__tpl__match=${__tpl__match##*"$TLB"}
-	while :; do
-		case "$__tpl__match" in
-		\{*) __tpl__match=${__tpl__match#'{'} ;;
-		*) break ;;
-		esac
-	done
+	__tpl__match=${__tpl__match#"${__tpl__match%%[!{]*}"}
 	__tpl__is_quoted=
 	__tpl__is_double_quoted=
 	__tpl__is_expansion=
