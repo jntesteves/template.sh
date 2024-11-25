@@ -63,9 +63,15 @@ pipe_catch() {
 # Simple POSIX-compatible cat utility in pure shell script
 # shellcheck disable=2120
 cat() (
+	while :; do
+		case "$1" in
+		-u) shift ;; # Ignore unused option flag
+		--) shift && break ;;
+		*) break ;;
+		esac
+	done
 	for filename in "$@"; do # Recursively print each file in arguments
 		case "$filename" in
-		-u) ;;              # Ignore unused flag
 		-) cat || return ;; # Print stdin
 		*) cat <"$filename" || return ;;
 		esac
