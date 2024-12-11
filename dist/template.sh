@@ -38,8 +38,8 @@ abort() {
 }
 
 # Pipeline Error Propagation Protocol
-__pepp__hash2() { printf '9OMuo2px''t1duEMvE''pXKp4Us6''T5tAPdHl''\037'; }
-__pepp__hash1() { printf '\037''lFCpRISk''bXHRLzR1''PH1YBNcn''QgkFWnJ2'; }
+__pepp__hash2() { printf '9OMuo2px''t1duEMvE''pXKp4Us6''T5tAPdHl'; }
+__pepp__hash1() { printf 'lFCpRISk''bXHRLzR1''PH1YBNcn''QgkFWnJ2'; }
 __pepp__status() (
 	payload=${1#*"$(__pepp__hash1)"}
 	payload=${payload%%"$(__pepp__hash2)"*}
