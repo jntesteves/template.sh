@@ -38,25 +38,33 @@ abort() {
 }
 
 # Pipeline Error Propagation Protocol
-__pep__hash2() { printf '9OMuo2px''t1duEMvE''pXKp4Us6''T5tAPdHl''\037'; }
-__pep__hash1() { printf '\037''lFCpRISk''bXHRLzR1''PH1YBNcn''QgkFWnJ2'; }
-__pep__status() (
-	payload=${1#*"$(__pep__hash1)"}
-	payload=${payload%%"$(__pep__hash2)"*}
-	payload=${payload##*"$(__pep__hash1)"}
-	status=$(printf '%.f' "$payload") || status=32
+__pepp__hash2() { printf '9OMuo2px''t1duEMvE''pXKp4Us6''T5tAPdHl''\037'; }
+__pepp__hash1() { printf '\037''lFCpRISk''bXHRLzR1''PH1YBNcn''QgkFWnJ2'; }
+__pepp__status() (
+	payload=${1#*"$(__pepp__hash1)"}
+	payload=${payload%%"$(__pepp__hash2)"*}
+	payload=${payload##*"$(__pepp__hash1)"}
+	# If a PEPP message was received, no matter the contents, pipe_check must fail, so coerce status to an error code
+	status=$(printf '%.f' "$payload") && [ "$status" -ge 1 ] && [ "$status" -le 255 ] || status=32
 	printf '%s' "$status"
 )
-pipe_throw() { printf '%s\n' "$(__pep__hash1)$?$(__pep__hash2)"; }
-pipe_try() { ("$@") || pipe_throw; }
-pipe_catch() {
+# shellcheck disable=SC2120
+throw() {
+	__throw__status=${1:-$?}
+	[ "$__throw__status" -gt 0 ] || [ "$1" ] || __throw__status=32
+	printf '%s\n' "_$(__pepp__hash1)${__throw__status}$(__pepp__hash2)_" || :
+	log_error "[throw] Pipeline aborted with status ${__throw__status}"
+	exit "$__throw__status"
+}
+try() { ("$@") || throw; }
+catch() {
 	[ "$#" -gt 0 ] || set -- printf '%s'
-	__pipe_catch__trailing_lf='
+	__catch__trailing_lf='
 '
-	while IFS= read -r __pipe_catch__line || { __pipe_catch__trailing_lf= && [ "$__pipe_catch__line" ]; }; do
-		case "$__pipe_catch__line" in
-		*"$(__pep__hash1)"*"$(__pep__hash2)"*) return "$(__pep__status "$__pipe_catch__line")" ;;
-		*) "$@" "${__pipe_catch__line}${__pipe_catch__trailing_lf}" || return ;;
+	while IFS= read -r __catch__line || { __catch__trailing_lf= && [ "$__catch__line" ]; }; do
+		case "$__catch__line" in
+		*"$(__pepp__hash1)"*"$(__pepp__hash2)"*) exit "$(__pepp__status "$__catch__line")" ;;
+		*) "$@" "${__catch__line}${__catch__trailing_lf}" || exit ;;
 		esac
 	done
 }
@@ -145,7 +153,7 @@ __tpl__expand_leftmost_expression() {
 	log_trace "[render] __tpl__head='${__tpl__head}' __tpl__match='${__tpl__match}' __tpl__tail='${__tpl__tail}'"
 	printf '%s' "$__tpl__head" || return
 	if [ "$__tpl__is_quoted" ]; then
-		pipe_try eval "$__tpl__command" </dev/null | pipe_catch escape_single_quotes || return
+		try eval "$__tpl__command" </dev/null | catch escape_single_quotes || return
 	else
 		(eval "$__tpl__command" </dev/null) || return
 	fi
