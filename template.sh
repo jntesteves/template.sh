@@ -27,12 +27,13 @@ EOF
 }
 
 echo() (IFS=' ' && printf '%s\n' "$*")
-log_error() (IFS=' ' && printf 'ERROR [template.sh] %s\n' "$*" >&2)
-log_debug() { :; } && [ "$TEMPLATE_SH_DEBUG" ] && log_debug() (IFS=' ' && printf 'DEBUG [template.sh] %s\n' "$*" >&2)
-log_trace() { :; } && case "$TEMPLATE_SH_DEBUG" in *trace*) log_trace() (IFS=' ' && printf 'TRACE [template.sh] %s\n' "$*" >&2) ;; esac
+log_error() { (IFS=' ' && printf 'ERROR %s\n' "$*" >&2) || :; }
+log_debug() { :; } && [ "$TEMPLATE_SH_DEBUG" ] && log_debug() { (IFS=' ' && printf 'DEBUG %s\n' "$*" >&2) || :; }
+log_trace() { :; } && case "$TEMPLATE_SH_DEBUG" in *trace*) log_trace() { (IFS=' ' && printf 'TRACE %s\n' "$*" >&2) || :; } ;; esac
 abort() {
 	__abort__status=${2:-$?}
-	log_error "$1" || :
+	[ "$__abort__status" -gt 0 ] || [ "$2" ] || __abort__status=1
+	log_error "$1"
 	exit "$__abort__status"
 }
 
@@ -141,7 +142,7 @@ __tpl__expand_leftmost_expression() {
 	__tpl__head=${1%"${TLB}${__tpl__match}${TRB}${__tpl__tail}"}
 	__tpl__head=${__tpl__head%\#}
 	set --
-	log_trace "__tpl__head='${__tpl__head}' __tpl__match='${__tpl__match}' __tpl__tail='${__tpl__tail}'"
+	log_trace "[render] __tpl__head='${__tpl__head}' __tpl__match='${__tpl__match}' __tpl__tail='${__tpl__tail}'"
 	printf '%s' "$__tpl__head" || return
 	if [ "$__tpl__is_quoted" ]; then
 		pipe_try eval "$__tpl__command" </dev/null | pipe_catch escape_single_quotes || return
@@ -172,24 +173,24 @@ render() (
 		while :; do
 			case "$__tpl__render_buffer" in
 			*"$TLB"*"$TRB"*)
-				log_debug "buffered expression=$__tpl__render_buffer"
-				__tpl__expand_leftmost_expression "$__tpl__render_buffer" || abort "(error $?) Failed to render line: $__tpl__render_buffer"
+				log_debug "[render] buffered expression=$__tpl__render_buffer"
+				__tpl__expand_leftmost_expression "$__tpl__render_buffer" || abort "[render] (error $?) Failed to render line: $__tpl__render_buffer"
 				;;
 			*"$TLB"*)
-				log_trace "  buffered open tag=$__tpl__render_buffer"
+				log_trace "[render]   buffered open tag=$__tpl__render_buffer"
 				__tpl__open_tags=1
 				break
 				;;
 			*)
-				log_trace "     buffered flush=$__tpl__render_buffer"
+				log_trace "[render]      buffered flush=$__tpl__render_buffer"
 				__tpl__open_tags=
 				break
 				;;
 			esac
 		done
-		# log_trace "__tpl__open_tags=${__tpl__open_tags}"
+		# log_trace "[render] __tpl__open_tags=${__tpl__open_tags}"
 		if [ ! "$__tpl__open_tags" ]; then # Flush buffer only when all opened tags are closed
-			printf '%s' "$__tpl__render_buffer" || abort "(error $?) Failed to write output file"
+			printf '%s' "$__tpl__render_buffer" || abort "[render] (error $?) Failed to write output file"
 			__tpl__render_buffer=
 		fi
 	done
