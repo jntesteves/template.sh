@@ -121,6 +121,12 @@ __tpl__expand_leftmost_expression() {
 	__tpl__match=${__tpl__match%%"$TRB"*}
 	__tpl__match=${__tpl__match##*"$TLB"}
 	__tpl__match=${__tpl__match#"${__tpl__match%%[!{]*}"}
+	__tpl__tail=${1#*"$TLB"}
+	__tpl__tail=${__tpl__tail#*"$TRB"}
+	__tpl__head=${1%"${TLB}${__tpl__match}${TRB}${__tpl__tail}"}
+	__tpl__head=${__tpl__head%"#"}
+	set --
+	log_trace "[render] __tpl__head='${__tpl__head}' __tpl__match='${__tpl__match}' __tpl__tail='${__tpl__tail}'"
 	__tpl__is_quoted=
 	__tpl__is_double_quoted=
 	__tpl__is_expansion=
@@ -145,12 +151,6 @@ __tpl__expand_leftmost_expression() {
 		*) __tpl__command="printf '%s' \"${__tpl__command}\"" ;;
 		esac
 	fi
-	__tpl__tail=${1#*"$TLB"}
-	__tpl__tail=${__tpl__tail#*"$TRB"}
-	__tpl__head=${1%"${TLB}${__tpl__match}${TRB}${__tpl__tail}"}
-	__tpl__head=${__tpl__head%\#}
-	set --
-	log_trace "[render] __tpl__head='${__tpl__head}' __tpl__match='${__tpl__match}' __tpl__tail='${__tpl__tail}'"
 	printf '%s' "$__tpl__head" || return
 	if [ "$__tpl__is_quoted" ]; then
 		try eval "$__tpl__command" </dev/null | catch escape_single_quotes || return
