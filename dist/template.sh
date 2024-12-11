@@ -200,7 +200,7 @@ while [ "$#" -gt 0 ]; do
 	case "$1" in
 	-C) { shift && cd "$1"; } || abort "Failed to cd into directory '-C $1'" ;;
 	-e | --env) { shift && assign_variable "$1"; } || abort "Failed to assign context variable '--env $1'" ;;
-	-s | --source) { shift && . "$1"; } || abort "Failed to source file '--source $1'" ;;
+	-s | --source) { shift && command . "$1"; } || abort "Failed to source file '--source $1'" ;;
 	--help) __tpl__usage ;;
 	--) shift && break ;;
 	-?*) __tpl__usage 2 "Unknown option '$1'" ;;
