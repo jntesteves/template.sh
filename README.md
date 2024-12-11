@@ -8,13 +8,13 @@ Process template from files or stdin and print the rendered text to stdout.
 template.sh 0.1.0-pre
 Render templates and print result to stdout. Expressions within {{{ and }}} delimiters will be evaluated as shell script and substituted by their stdout in the rendered output. Context variables can be printed directly as {{{$VAR_NAME}}} or {{{'$VAR_NAME'}}} to escape the result for inclusion in single-quoted shell strings
 
-Usage: template.sh [-C PATH]... [-s FILE]... [-e NAME=VALUE]... [-] [FILE...]
+Usage: template.sh [-C PATH] [-s FILE]... [-e NAME=VALUE]... [--] [- | FILE...]
 
 Options:
  -C PATH               Directory to operate in
  -e, --env NAME=VALUE  Set variable NAME=VALUE in render context
  -s, --source FILE     Source FILE to import its functions/variables in render context
- -?, --help            Print this help text and exit
+ --help                Print this help text and exit
 
 Environment variables:
  TEMPLATE_SH_DEBUG  Log verbosity, set to 1 or 'trace' to see debug and trace messages
