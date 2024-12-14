@@ -28,13 +28,16 @@ Examples:
 
 ```shell
 # With the apostrophes, {{{'$VERSION'}}} will be escaped and can be safely included in single-quoted shell strings
-VERSION='{{{'$VERSION'}}}'
+VERSION_TEXT='version: {{{'$VERSION'}}}'
 
 # Any command can be executed, the expression will be substituted by the command's standard output
 GIT_VERSION='{{{' git describe --tags --long --abbrev=40 '}}}'
 
 # Both Parameter Expansion and Arithmetic Expansion have short forms, you don't need to printf the expansion to stdout
 ANSWER={{{$((363636 / 13 / 666))}}}
+
+# Complex Parameter Expansions are supported - anything that can go in a ${var} style expansion, like default values and substring expansions
+{{{${VARIABLE:-"Default value"}}}}
 
 # Another template file can be rendered and embedded anywhere in the result
 {{{ render ./functions.template.sh }}}

@@ -123,34 +123,27 @@ __tpl__expand_leftmost_expression() {
 	__tpl__match=${__tpl__match#"${__tpl__match%%[!{]*}"}
 	__tpl__tail=${1#*"$TLB"}
 	__tpl__tail=${__tpl__tail#*"$TRB"}
+	__tpl__is_quoted=
+	__tpl__is_double_quoted=
+	case "$__tpl__match" in
+	\'*\') __tpl__is_quoted=1 ;;
+	\"*\") __tpl__is_double_quoted=1 ;;
+	\$\{[_a-zA-Z]*) case "$__tpl__tail" in \}*) __tpl__match=${__tpl__match}"}" __tpl__tail=${__tpl__tail#"}"} ;; esac ;;
+	esac
 	__tpl__head=${1%"${TLB}${__tpl__match}${TRB}${__tpl__tail}"}
 	__tpl__head=${__tpl__head%"#"}
 	set --
-	log_trace "[render] __tpl__head='${__tpl__head}' __tpl__match='${__tpl__match}' __tpl__tail='${__tpl__tail}'"
-	__tpl__is_quoted=
-	__tpl__is_double_quoted=
-	__tpl__is_expansion=
-	case "$__tpl__match" in
-	\'\$[_a-zA-Z]*\' | \'\$\(\(*\)\)\')
-		__tpl__is_quoted=1
-		__tpl__is_expansion=1
-		;;
-	\'*\') __tpl__is_quoted=1 ;;
-	\$[_a-zA-Z]* | \$\(\(*\)\)) __tpl__is_expansion=1 ;;
-	\"*\") __tpl__is_double_quoted=1 ;;
-	esac
+	log_trace "[render] head='${__tpl__head}' match='${__tpl__match}' tail='${__tpl__tail}'"
 	__tpl__command=$__tpl__match
 	if [ "$__tpl__is_quoted" ] || [ "$__tpl__is_double_quoted" ]; then
 		__tpl__command=${__tpl__command#?}
 		__tpl__command=${__tpl__command%?}
 	fi
-	if [ "$__tpl__is_expansion" ]; then
-		case "${__tpl__command#"$"}" in
-		\(\(*\)\)) __tpl__command="printf '%s' \"${__tpl__command}\"" ;; # Arithmetic Expansion
-		*[!_a-zA-Z0-9]* | [!_a-zA-Z]*) __tpl__is_expansion= ;;           # Not a valid variable name
-		*) __tpl__command="printf '%s' \"${__tpl__command}\"" ;;
-		esac
-	fi
+	case "$__tpl__command" in
+	\$\{[_a-zA-Z]*\} | \$\(\(*\)\)) __tpl__command="printf '%s' \"${__tpl__command}\"" ;;
+	\$*[!_a-zA-Z0-9]*) ;;
+	\$[_a-zA-Z]*) __tpl__command="printf '%s' \"${__tpl__command}\"" ;;
+	esac
 	printf '%s' "$__tpl__head" || return
 	if [ "$__tpl__is_quoted" ]; then
 		try eval "$__tpl__command" </dev/null | catch escape_single_quotes || return

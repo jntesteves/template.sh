@@ -29,8 +29,11 @@ quoted="Some text [wrapped] around expression"
 
 
 
-: after two lines, version='0.1.0-pre+tag 33'
-: Arithmetic Expansion: 66
+: after two lines, version='0.1.0-pre+tag'
+Replacement text
+: Substring expansion: version="0.1.0+tag"
+: Default value expansion: replacement-1 replacement-2 replacement-3
+: Arithmetic Expansion: 66 55 33
 : Command Substitution: arg1  
   arg2arg3
 # ===== Multiline and nested expressions ======================================================

@@ -21,11 +21,14 @@ var='{{{' printf "it's got apostrophe!" '}}} But will the echos break 2 lines he
 var='{{{' printf value\'1; printf value2\' '}}} {{{'printf "value3"'}}}{{{' printf "'value4" '}}}'
 quoted="Some text {{{" printf "[wrapped]" "}}} around expression"
 # ===== Parameter Expansion, Arithmetic Expansion, Command Substitution =======================
-{{{'$TWO_NEW_LINES'}}}{{{' $TWO_NEW_LINES '}}}{{{'$TWO_NEW_LINES '}}}
+{{{'$TWO_NEW_LINES'}}}{{{' $TWO_NEW_LINES '}}}{{{' $TWO_NEW_LINES'}}}{{{'$TWO_NEW_LINES '}}}{{{' ${TWO_NEW_LINES} '}}}{{{' ${TWO_NEW_LINES}'}}}{{{'${TWO_NEW_LINES} '}}}
 : after two lines, command: {{{$COMMAND}}}
-{{{$TWO_NEW_LINES}}}{{{ $TWO_NEW_LINES }}}{{{$TWO_NEW_LINES }}}
-: after two lines, version='{{{'$VERSION'}}}+{{{'$TAG'}}} {{{'$((11 + 22))'}}}'
-: Arithmetic Expansion: {{{$((11 + 22 + 33))}}}
+{{{"$TWO_NEW_LINES"}}}{{{" $TWO_NEW_LINES "}}}{{{" $TWO_NEW_LINES"}}}{{{"$TWO_NEW_LINES "}}}{{{" ${TWO_NEW_LINES} "}}}{{{" ${TWO_NEW_LINES}"}}}{{{"${TWO_NEW_LINES} "}}}
+: after two lines, version='{{{'$VERSION'}}}+{{{'$TAG'}}}'
+{{{${TWO_NEW_LINES:+"Replacement text"}}}}{{{ ${TWO_NEW_LINES} }}}{{{${TWO_NEW_LINES} }}}{{{ $TWO_NEW_LINES }}}{{{ $TWO_NEW_LINES}}}{{{$TWO_NEW_LINES }}}
+: Substring expansion: version="{{{"${VERSION%[[:punct:]]pre*}"}}}+{{{"$TAG"}}}"
+: Default value expansion: {{{${UNSET_VAR:-"replacement-1"}}}} {{{'${UNSET_VAR:-"replacement-2"}'}}} {{{"${UNSET_VAR:-"replacement-3"}"}}}
+: Arithmetic Expansion: {{{$((11 + 22 + 33))}}} {{{"$((22 + 33))"}}} {{{'$((11 + 22))'}}}
 : Command Substitution: {{{$(echo printf) arg1}}}  {{{$(echo echo)}}}  {{{IFS=' '; $(echo printf '%s' arg2) arg3}}}
 # ===== Multiline and nested expressions ======================================================
 {{{ printf ' %s' {{{ printf cmd }}} arg1 arg2 }}}{{{
