@@ -165,8 +165,8 @@ __tpl__expand_leftmost_expression() {
 render() (
 	for __tpl__filename in "$@"; do # Recursively render each file in arguments
 		case "$__tpl__filename" in
-		-) render || return ;; # Render stdin
-		*) render <"$__tpl__filename" || return ;;
+		-) render || abort "[render] Failed to render template from stdin" ;;
+		*) render <"$__tpl__filename" || abort "[render] Failed to render template from file ${__tpl__filename}" ;;
 		esac
 	done
 	[ "$#" -eq 0 ] || return 0 # Only render from stdin when no arguments
