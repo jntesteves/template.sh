@@ -190,12 +190,12 @@ render() (
 			esac
 		done
 		# log_trace "[render] __tpl__open_tags=${__tpl__open_tags}"
-		if [ ! "$__tpl__open_tags" ]; then # Flush buffer only when all opened tags are closed
+		if ! [ "$__tpl__open_tags" ]; then # Flush buffer only when all opened tags are closed
 			printf '%s' "$__tpl__render_buffer" || abort "[render] (error $?) Failed to write output file"
 			__tpl__render_buffer=
 		fi
 	done
-	[ ! "$__tpl__open_tags" ] || printf '%s' "$__tpl__render_buffer" # Flush data left in the buffer if a tag was left open
+	! [ "$__tpl__open_tags" ] || printf '%s' "$__tpl__render_buffer" # Flush data left in the buffer if a tag was left open
 )
 
 while [ "$#" -gt 0 ]; do
